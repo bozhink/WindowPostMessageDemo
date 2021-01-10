@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Widget Page";
+}
+
+<h2>Widget content</h2>
+
+<div class="panel">
+    <button id="btn-left">Left</button>
+    <button id="btn-right">Right</button>
+</div>
+
+<ol id="log"></ol>
+
+<script>
+    var widgetName;
+
+    window.addEventListener('message', function (e) {
+        var li, ol;
+        
+        if (e.data.type === 'onload' && e.data.widgetName) {
+            widgetName = e.data.widgetName;
+        }
+
+        if (widgetName && e.data.widgetName === widgetName) {
+            ol = document.getElementById('log');
+            if (ol instanceof HTMLOListElement) {
+                li = document.createElement('li');
+                li.innerHTML = '<strong>' + e.data.title + ': </strong>' + e.data.message;
+                ol.appendChild(li);
+            }
+        }
+    });
+
+    // Add event listener on button Left
+    document
+        .getElementById('btn-left')
+        .addEventListener('click', function (e) {
+            var payload = {
+                color: 'green',
+                widgetName: widgetName
+            };
+
+            window.parent.postMessage(payload, '*');
+        });
+
+    // Add event listener on button Right
+    document
+        .getElementById('btn-right')
+        .addEventListener('click', function (e) {
+            var payload = {
+                color: 'blue',
+                widgetName: widgetName
+            };
+
+            window.parent.postMessage(payload, '*');
+        });
+</script>

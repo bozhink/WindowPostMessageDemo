@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1 id="heading">Demo Window.postMessage()</h1>
+
+<div class="panel">
+    <button id="btn1">Button 1</button>
+    <button id="btn2">Button 2</button>
+</div>
+
+<iframe id="widget-iframe" src="@(Url.Action("Widget"))" style="width: 100%; height: 500px;"></iframe>
+
+<script>
+    var widgetName = 'Demo Widget';
+    var widgetWindow;
+
+    // Send first message to the widget iframe
+    document
+        .getElementById('widget-iframe')
+        .addEventListener('load', function (e) {
+            var target = e.target, payload;
+            if (target instanceof HTMLIFrameElement) {
+                payload = {
+                    title: 'On load',
+                    message: 'Message from parent window',
+                    type: 'onload',
+                    widgetName: widgetName
+                };
+
+                widgetWindow = target.contentWindow;
+                
+                widgetWindow.postMessage(payload, '*');
+            }
+        });
+    
+    // Add event listener on Button 1.
+    document
+        .getElementById('btn1')
+        .addEventListener('click', function (e) {
+            var payload;
+            if (widgetWindow) {
+                payload = {
+                    title: 'Button 1',
+                    message: 'Message from parent window #1',
+                    type: 'click',
+                    widgetName: widgetName
+                };
+                
+                widgetWindow.postMessage(payload, '*');
+            }
+        });
+
+    // Add event listener on Button 2.
+    document
+        .getElementById('btn2')
+        .addEventListener('click', function (e) {
+            var payload;
+            if (widgetWindow) {
+                payload = {
+                    title: 'Button 2',
+                    message: 'Message from parent window #2',
+                    type: 'click',
+                    widgetName: widgetName
+                };
+                
+                widgetWindow.postMessage(payload, '*');
+            }
+        });
+
+    // Add Window.postMessage() handler.
+    window.addEventListener('message', function (e) {
+        var h;
+        if (e.data.widgetName === widgetName) {
+            h = document.getElementById('heading');
+            h.style.color = e.data.color;
+        }
+    });
+</script>
